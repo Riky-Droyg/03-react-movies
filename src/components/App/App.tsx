@@ -8,7 +8,7 @@ import MovieModal from "../MovieModal/MovieModal";
 
 import { fetchMovies } from "../../services/movieService";
 import type { Movie } from "../../types/movie";
-import ErrorMessage from "../ErrorMessege/ErrorMessage";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
 
 export default function App() {
   const [searchData, setSearchData] = useState("");
