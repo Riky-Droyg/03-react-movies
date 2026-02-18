@@ -8,12 +8,14 @@ import MovieModal from "../MovieModal/MovieModal";
 
 import { fetchMovies } from "../../services/movieService";
 import type { Movie } from "../../types/movie";
+import ErrorMessage from "../ErrorMessege/ErrorMessage";
 
 export default function App() {
-  const [searchData, setSearchData] = useState<string>("");
+  const [searchData, setSearchData] = useState("");
   const [movies, setMovies] = useState<Movie[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  const [error, setError] = useState(false);
 
   const reqId = useRef(0);
 
@@ -25,8 +27,8 @@ export default function App() {
     let active = true;
 
     const run = async () => {
-      // переносимо setState всередину callback'а
       setLoading(true);
+      setError(false);
       setMovies(null);
       setSelectedMovie(null);
 
@@ -39,6 +41,10 @@ export default function App() {
         if (data.length === 0) {
           toast.error("No movies found for your request.", { position: "top-right" });
         }
+      } catch {
+        if (!active || reqId.current !== id) return;
+        setError(true);
+        setMovies(null);
       } finally {
         if (active && reqId.current === id) setLoading(false);
       }
@@ -58,11 +64,12 @@ export default function App() {
 
       {loading && <p>Loading...</p>}
 
-      {movies && movies.length > 0 && (
-        <MovieGrid
-          movies={movies}
-          onSelect={(movie) => setSelectedMovie(movie)}
-        />
+      {error ? (
+        <ErrorMessage />
+      ) : (
+        movies && movies.length > 0 && (
+          <MovieGrid movies={movies} onSelect={setSelectedMovie} />
+        )
       )}
 
       {selectedMovie && (
