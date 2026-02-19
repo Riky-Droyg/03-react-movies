@@ -1,18 +1,40 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { createPortal } from "react-dom";
 import css from "./MovieModal.module.css";
 import type { Movie } from "../../types/movie";
 
-interface MovieModalProps  {
+interface MovieModalProps {
   movie: Movie;
   onClose: () => void;
-};
+}
 
 export default function MovieModal({ movie, onClose }: MovieModalProps) {
+  // lock scroll ASAP (before paint) + lock both html and body
+  useLayoutEffect(() => {
+    const body = document.body;
+    const html = document.documentElement;
+
+    const prevBodyOverflow = body.style.overflow;
+    const prevHtmlOverflow = html.style.overflow;
+
+    body.style.setProperty("overflow", "hidden", "important");
+    html.style.setProperty("overflow", "hidden", "important");
+
+    return () => {
+      if (prevBodyOverflow) body.style.overflow = prevBodyOverflow;
+      else body.style.removeProperty("overflow");
+
+      if (prevHtmlOverflow) html.style.overflow = prevHtmlOverflow;
+      else html.style.removeProperty("overflow");
+    };
+  }, []);
+
+  // esc close
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
+
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [onClose]);
