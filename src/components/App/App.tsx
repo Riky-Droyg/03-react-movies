@@ -12,7 +12,7 @@ import ErrorMessage from "../ErrorMessage/ErrorMessage";
 
 export default function App() {
   const [searchData, setSearchData] = useState("");
-  const [movies, setMovies] = useState<Movie[] | null>(null);
+  const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const [error, setError] = useState(false);
@@ -29,7 +29,7 @@ export default function App() {
     const run = async () => {
       setLoading(true);
       setError(false);
-      setMovies(null);
+      setMovies([]);
       setSelectedMovie(null);
 
       try {
@@ -44,7 +44,7 @@ export default function App() {
       } catch {
         if (!active || reqId.current !== id) return;
         setError(true);
-        setMovies(null);
+        setMovies([]);
       } finally {
         if (active && reqId.current === id) setLoading(false);
       }
@@ -60,7 +60,7 @@ export default function App() {
   return (
     <>
       <Toaster />
-      <SearchBar setSearchData={setSearchData} />
+      <SearchBar onSubmit={setSearchData} />
 
       {loading && <p>Loading...</p>}
 
